@@ -1,0 +1,50 @@
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: project_management_app
+        container_name: project_management_app
+        restart: unless-stopped
+        working_dir: /var/www/html
+        environment:
+            - APP_NAME=ProjectManagement
+            - DB_HOST=db
+            - DB_DATABASE=project_management
+            - DB_USERNAME=root
+            - DB_PASSWORD=root
+        volumes:
+            - .:/var/www/html
+            - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+        networks:
+            - project_management_network
+
+    webserver:
+        image: nginx:alpine
+        container_name: nginx
+        restart: unless-stopped
+        ports:
+            - "8000:80"
+        volumes:
+            - .:/var/www/html
+            - ./nginx/conf.d:/etc/nginx/conf.d
+        networks:
+            - project_management_network
+
+    db:
+        image: mysql:5.7
+        container_name: mysql
+        restart: unless-stopped
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: project_management
+        volumes:
+            - mysql:/var/lib/mysql
+        networks:
+            - project_management_network
+
+networks:
+    project_management_network:
+
+volumes:
+    mysql:
