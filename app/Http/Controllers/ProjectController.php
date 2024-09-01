@@ -2,65 +2,96 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Implementation\ProjectService;
+use App\Services\ProjectServiceInterface;
 use Illuminate\Http\Request;
+
+use Illuminate\Http\JsonResponse;
 
 class ProjectController extends Controller
 {
+    protected $projectService;
+
     /**
-     * Display a listing of the resource.
+     * ProjectController constructor.
+     *
+     * @param ProjectService $projectService
      */
-    public function index()
+    public function __construct(ProjectServiceInterface $projectService)
     {
-        return response()->json([
-            'message' => 'This is the index method of the ProjectController',
+        $this->projectService = $projectService;
+    }
+
+    /**
+     * Display a listing of the projects.
+     *
+     * @return JsonResponse
+     */
+    public function index(): JsonResponse
+    {
+        $projects = $this->projectService->all();
+        return response()->json($projects);
+    }
+
+    /**
+     * Store a newly created project in storage.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
         ]);
+
+        $project = $this->projectService->create($data);
+        return response()->json($project, 201);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Display the specified project.
+     *
+     * @param int $id
+     * @return JsonResponse
      */
-    public function create()
+    public function show(int $id): JsonResponse
     {
-        //
+        $project = $this->projectService->find($id);
+        if (!$project) {
+            return response()->json(['message' => 'Project not found'], 404);
+        }
+        return response()->json($project);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Update the specified project in storage.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
      */
-    public function store(Request $request)
+    public function update(Request $request, int $id): JsonResponse
     {
-        //
+        $data = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $project = $this->projectService->update($id, $data);
+        return response()->json($project);
     }
 
     /**
-     * Display the specified resource.
+     * Remove the specified project from storage.
+     *
+     * @param int $id
+     * @return JsonResponse
      */
-    public function show(string $id)
+    public function destroy(int $id): JsonResponse
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $this->projectService->delete($id);
+        return response()->json(['message' => 'Project deleted successfully']);
     }
 }
