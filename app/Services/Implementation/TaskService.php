@@ -3,11 +3,12 @@
 namespace App\Services\Implementation;
 use App\Models\Task;
 use App\Repository\Eloquent\TaskRepository;
+use App\Services\Implementation\Base\BaseService;
 use App\Services\TaskServiceInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
-class TaskService implements TaskServiceInterface
+class TaskService extends BaseService implements TaskServiceInterface
 {
     protected $taskRepository;
 
@@ -18,62 +19,8 @@ class TaskService implements TaskServiceInterface
      */
     public function __construct(TaskRepository $taskRepository)
     {
+        parent::__construct($taskRepository);
         $this->taskRepository = $taskRepository;
-    }
-
-    /**
-     * Get all tasks.
-     *
-     * @return Collection
-     */
-    public function all(): Collection
-    {
-        return $this->taskRepository->all();
-    }
-
-    /**
-     * Create a new task.
-     *
-     * @param array $data
-     * @return Model
-     */
-    public function create(array $data): Model
-    {
-        return $this->taskRepository->create($data);
-    }
-
-    /**
-     * Find a task by ID.
-     *
-     * @param int $id
-     * @return Model|null
-     */
-    public function find(int $id): ?Model
-    {
-        return $this->taskRepository->find($id);
-    }
-
-    /**
-     * Update a task by ID.
-     *
-     * @param int $id
-     * @param array $data
-     * @return Model|null
-     */
-    public function update(int $id, array $data): ?Model
-    {
-        return $this->taskRepository->update($id, $data);
-    }
-
-    /**
-     * Delete a task by ID.
-     *
-     * @param int $id
-     * @return bool
-     */
-    public function delete(int $id): bool
-    {
-        return $this->taskRepository->delete($id);
     }
 
     /**

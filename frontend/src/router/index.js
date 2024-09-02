@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import store from '@/store';
+import LoginPage from "@/views/LoginPage.vue";
 
 const routes = [
   {
@@ -7,6 +9,8 @@ const routes = [
     name: 'home',
     component: HomeView
   },
+  { path: '/tasks', name: 'Task', component: () => import('../views/tasks') },
+  { path: '/login', name: 'Login', component: LoginPage },
   {
     path: '/about',
     name: 'about',
@@ -22,4 +26,11 @@ const router = createRouter({
   routes
 })
 
+router.beforeEach((to, from, next) => {
+    if (to.meta.requiresAuth && !store.state.authenticated) {
+        next({ name: 'Login' });
+    } else {
+        next();
+    }
+});
 export default router

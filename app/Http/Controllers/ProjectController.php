@@ -7,6 +7,7 @@ use App\Services\ProjectServiceInterface;
 use Illuminate\Http\Request;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class ProjectController extends Controller
 {
@@ -23,13 +24,30 @@ class ProjectController extends Controller
     }
 
     /**
-     * Display a listing of the projects.
+     * Sophisticated index method with more Advanced search and pagination
      *
      * @return JsonResponse
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $projects = $this->projectService->all();
+        Log::debug('ProjectController@index');
+        $perPage = $request->input('per_page', 15);
+        $orderBy = $request->input('order_by', 'id');
+        $orderType = $request->input('order_type', 'desc');
+        $keyword = $request->input('keyword', null);
+        $projects = $this->projectService->query();
+        if ($keyword) {
+            $projects = $projects->where('name', 'like', '%' . $keyword . '%')
+                ->orWhere('description', 'like', '%' . $keyword . '%');
+        }
+        $projects = $projects
+            ->orderBy($orderBy, $orderType)
+            ->paginate($perPage);
+
+        //log projects
+        Log::info('projects: ' );
+        Log::info($projects);
+
         return response()->json($projects);
     }
 

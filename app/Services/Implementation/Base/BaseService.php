@@ -57,6 +57,17 @@ class BaseService
     }
 
     /**
+     * Get eloquent query builder.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+
+    public function query(): \Illuminate\Database\Eloquent\Builder
+    {
+        return $this->repository->query();
+    }
+
+    /**
      * Update an entity by ID.
      *
      * @param int $id

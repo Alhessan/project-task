@@ -31,6 +31,13 @@ interface EloquentRepositoryInterface
      * @return Post $post
      */
     public function all(): Collection;
+
+    /**
+     * Get eloquent query builder.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function query(): \Illuminate\Database\Eloquent\Builder;
     /**
      * Update Model
      *

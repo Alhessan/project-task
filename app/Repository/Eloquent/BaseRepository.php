@@ -57,6 +57,16 @@ class BaseRepository implements EloquentRepositoryInterface
     }
 
     /**
+     * Get eloquent query builder.
+     *
+     * @return
+     */
+    public function query(): \Illuminate\Database\Eloquent\Builder
+    {
+        return $this->model->query();
+    }
+
+    /**
      * Update Model
      *
      * @param id

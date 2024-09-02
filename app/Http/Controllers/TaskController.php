@@ -25,9 +25,22 @@ class TaskController extends Controller
      * @param int $projectId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index($projectId)
+    public function index($projectId, Request $request)
     {
-        $tasks = $this->taskService->getTasksByProjectId($projectId);
+        $perPage = $request->input('per_page', 15);
+        $orderBy = $request->input('order_by', 'id');
+        $orderType = $request->input('order_type', 'desc');
+        $keyword = $request->input('keyword', null);
+        $tasks = $this->taskService->query();
+        $tasks = $tasks->where('project_id', $projectId);
+        if ($keyword) {
+            $tasks = $tasks->where('name', 'like', '%' . $keyword . '%')
+                ->orWhere('description', 'like', '%' . $keyword . '%');
+        }
+        $tasks = $tasks
+            ->orderBy($orderBy, $orderType)
+            ->paginate($perPage);
+
         return response()->json($tasks);
     }
 
